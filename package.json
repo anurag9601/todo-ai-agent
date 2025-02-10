@@ -1,0 +1,30 @@
+{
+  "name": "pract-ai-agent",
+  "version": "1.0.0",
+  "description": "",
+  "main": "index.js",
+  "scripts": {
+    "dev": "tsc-watch --onSuccess \"node dist/index.js\"",
+    "start": "node dist/index.js",
+    "build": "tsc -p ."
+  },
+  "keywords": [],
+  "author": "",
+  "license": "ISC",
+  "devDependencies": {
+    "@types/node": "^22.13.1",
+    "prisma": "6.3.1",
+    "tsc-watch": "^6.2.1",
+    "typescript": "^5.7.3"
+  },
+  "dependencies": {
+    "@langchain/core": "^0.3.39",
+    "@langchain/google-genai": "^0.1.8",
+    "@langchain/langgraph": "^0.2.45",
+    "@prisma/client": "6.3.1",
+    "dotenv": "^16.4.7",
+    "langchain": "^0.3.15",
+    "langsmith": "^0.3.7",
+    "zod": "^3.24.1"
+  }
+}
