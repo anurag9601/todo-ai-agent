@@ -105,7 +105,27 @@ const updateTodo = tool(async ({ id, newTodo }: { id: string, newTodo: string })
     })
 })
 
-const tools = [createTodo, listAllTodos, deleteTodo, updateTodo]
+const getTodoById = tool(async (id: string) => {
+    try {
+        const findTodoById = await db.todo.findUnique({
+            where: {
+                id: parseInt(id)
+            }
+        });
+
+        return findTodoById ? findTodoById : `No Todo availabe with the ID ${id}`
+    } catch (err) {
+        if (err instanceof Error) {
+            return err.message;
+        }
+    }
+}, {
+    name: "getTodoById",
+    description: "This function takes the ID of a todo and find it if Todo is not availabe it simply returns todo is not present with respective id",
+    schema: z.string().describe("This string should be a number with a type string Which will be the ID of the todo")
+})
+
+const tools = [createTodo, listAllTodos, deleteTodo, updateTodo, getTodoById]
 
 const model = new ChatGoogleGenerativeAI({
     modelName: "gemini-pro",
@@ -119,7 +139,7 @@ async function init() {
         if (prompt.toLowerCase() === "exit") {
             rl.close();
             console.log(`You are Exit..
-            Hope you will be happy with my service 😉✌️`);
+Hope you will be happy with my service 😉✌️`);
             return;
         }
 
@@ -132,7 +152,22 @@ async function init() {
         });
 
         const response = await agent.invoke(
-            { messages: [new HumanMessage(prompt)] },
+            { messages: [ { role: "system" , content: `You are helpful Todo AI Assistant. You have ability to createTodo, listAllTodos, deleteTodo, updateTodo, getTodoById these all operations you can do. 
+            first take user input
+            observer
+            If user just say any task so create todo of it in the database use createTodo tool.
+            If user sends ID of the todo to delete or just say i have delete this task then you should so and delete that todo related todo from database 
+            If user ask you to update so user can send you the ID of the todo or just give you the context of the todo then you have to search the todo in your previous saved data and update it on the basis of updated text
+            If user will ask you by taking some context of todo that this context of todo is available or not then you should check in prev todo that the prev todo's includes this words or this todo or not and if anything available send that to user
+            
+            Example:
+            Observing the input
+            I have metting on 12pm 
+            Calling createTodo function 
+            passing parameter I have metting on 12pm
+            and after completing the function operation sending the todo ID to user and also saving it
+            
+            `} ,new HumanMessage(prompt)] },
             { configurable: { thread_id: "42" } },
         );
 
